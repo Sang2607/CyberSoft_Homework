@@ -23,6 +23,6 @@ def SaveFile(FileName,Title,NestedList):
         if len(NestedList) == 0:
             print("Lỗi: Vui lòng kiểm tra Data cần thêm")
         else:
-            AppendRows(FileName,Title,NestedList)
+            AppendRows(FileName,Title,NestedList[1:])
     else:
         CreateExcel(FileName,Title,NestedList)
