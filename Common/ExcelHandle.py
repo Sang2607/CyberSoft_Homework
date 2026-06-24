@@ -18,11 +18,11 @@ def AppendRows(FileName,Title,NTL):
         ws.append(i)
     wb.save(FileName)
 
-def SaveFile(FileName,Title,NestedList):
+def SaveFile(FileName,Title,NestedList,removeHeder = True):
     if os.path.exists(FileName):
         if len(NestedList) == 0:
             print("Lỗi: Vui lòng kiểm tra Data cần thêm")
         else:
-            AppendRows(FileName,Title,NestedList[1:])
+            AppendRows(FileName,Title, NestedList[1:] if removeHeder else NestedList)
     else:
         CreateExcel(FileName,Title,NestedList)

@@ -1,16 +1,16 @@
 from Common.Decorator import handle_exception
 
 @handle_exception
-def inputInt():
-    return int(input())
+def inputInt(Mess = ""):
+    return int(input(Mess))
 
 @handle_exception
-def inputFloat():
-    return float(input())
+def inputFloat(Mess = ""):
+    return float(input(Mess))
 
 @handle_exception
-def inputStr():
-    return input()
+def inputStr(Mess = ""):
+    return input(Mess)
 
 def quickSort(arr): # Độ phức tạp O(nlogn)
     if len(arr) == 0:
