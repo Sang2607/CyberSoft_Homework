@@ -26,3 +26,12 @@ def SaveFile(FileName,Title,NestedList,removeHeder = True):
             AppendRows(FileName,Title, NestedList[1:] if removeHeder else NestedList)
     else:
         CreateExcel(FileName,Title,NestedList)
+
+#đọc tất cả dữ liệu trong file
+def ReadFile(FileName):
+    print(FileName)
+    wb = load_workbook(FileName)
+    ws = wb.active
+
+    for row in ws.iter_rows(values_only=True):
+        print(row)
