@@ -1,5 +1,6 @@
 from openpyxl import Workbook,load_workbook
 import os
+from Common.FunctionHandle import inputStr
 #insert
 def CreateExcel(FileName,Title,NTL):
     wb = Workbook()
@@ -18,7 +19,9 @@ def AppendRows(FileName,Title,NTL):
         ws.append(i)
     wb.save(FileName)
 
-def SaveFile(FileName,Title,NestedList,removeHeder = True):
+def SaveFile(FileName,Title,NestedList,dialogConfirm:str = None,removeHeder = True):
+    if dialogConfirm and inputStr(dialogConfirm + " (y/n):") != "y":
+        return
     if os.path.exists(FileName):
         if len(NestedList) == 0:
             print("Lỗi: Vui lòng kiểm tra Data cần thêm")
@@ -26,6 +29,7 @@ def SaveFile(FileName,Title,NestedList,removeHeder = True):
             AppendRows(FileName,Title, NestedList[1:] if removeHeder else NestedList)
     else:
         CreateExcel(FileName,Title,NestedList)
+    print("Thành công!")
 
 #đọc tất cả dữ liệu trong file
 def ReadFile(FileName):
