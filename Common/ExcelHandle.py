@@ -34,9 +34,10 @@ def SaveFile(FileName,Title,NestedList,dialogConfirm:str = None,removeHeder = Tr
     print("Thành công!")
 
 #đọc tất cả dữ liệu trong file
-def ReadFile(FileName,ValueOnly = True,Vitri = 1):
+def ReadFile(FileName,ValueOnly = True,Vitri = 1, isMaxRow = False):
     print(FileName)
     wb = load_workbook(FileName)
     ws = wb.active
-    rows = list(ws.iter_rows(values_only=ValueOnly, min_row=Vitri))
+
+    rows = list(ws.iter_rows(values_only=ValueOnly, min_row=Vitri,max_row = ws.max_row if isMaxRow else None))
     return rows,ws,wb

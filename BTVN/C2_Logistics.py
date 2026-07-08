@@ -6,10 +6,8 @@ from Common.ExcelHandle import ReadFile
 path_File = f"{BASE_DIR}/Files/data_logistics.xlsx"
 
 #Mức phân khối lượng
-kl5,kl10 = 5,20
+kl5,kl20 = 5,20
 
-MucGiam = 0
-LoaiVanChuyen = {"Siêu tốc":20000}
 LoaiKhuVuc = {
     "Hà Nội": "Bac",
     "Hải Phòng": "Bac",
@@ -20,23 +18,64 @@ LoaiKhuVuc = {
     "Cần Thơ": "Nam",
     "Vũng Tàu": "Nam",
 }
+rows ,ws ,wb = ReadFile(path_File,True,2,isMaxRow=True) # cần refactor -> do tốn ram nếu kích thước quá lớn => dùng context manager
+
+
 def CheckHeader():
-    rows ,_ ,wb = ReadFile(path_File,False,1) # cần refactor -> do tốn ram nếu kích thước quá lớn => dùng context manager
-    cell1, cell2, cell3, cell4, cell5, cell6, cell7, cell8, cell9, cell10 = "Mã đơn","Khách hàng","Loại hàng"	,"Nơi gửi"	,"Nơi nhận","Khối lượng (kg)",	"Loại vận chuyển",	"Cước cơ bản (đ/kg)","Phí vận chuyển (đ)","Phân loại"
+    cells = {
+    "cell1": "Mã đơn",
+    "cell2": "Khách hàng",
+    "cell3": "Loại hàng",
+    "cell4": "Nơi gửi",
+    "cell5": "Nơi nhận",
+    "cell6": "Khối lượng (kg)",
+    "cell7": "Loại vận chuyển",
+    "cell8": "Cước cơ bản (đ/kg)",
+    "cell9": "Phí vận chuyển (đ)",
+    "cell10": "Phân loại",
+    }
+    for i in range(1,len(cells) + 1):
+        if ws.cell(row=1, column=i).value != cells[f"cell{i}"]:
+            ws.cell(row=1, column=i).value = cells[f"cell{i}"]
+            print(f"Đã thêm tiêu đề: {ws.cell(row=1, column=i).value}")
+def TinhCuocPhi():
+    for i, row in enumerate(rows, start=2):
+        ma_don = rows[0]
+        #tạo biến local
+        khoi_luong = row[5] 
+        cuoc_coban = row[7]
+        loai_vanchuyen = row[6] 
+        from_location = row[3]
+        to_location = row[4]
+        phi_ban_dau = float(khoi_luong) *  float(cuoc_coban)
 
-    print(rows[0])
+        #tính giá giảm
+        giamgia = 0
+        if khoi_luong > kl20:
+            giamgia = 0.1
+        elif  khoi_luong > kl5:
+            giamgia = 0.05
+        giamgia += checkLocation(from_location,to_location)
+        
+        #tính tổng tiền
+        tongtien = phi_ban_dau * (1-giamgia) # phibandau - phibandau*giamgia 
+        if loai_vanchuyen == "Siêu tóc":
+            tongtien += 20000
+        ws.cell(row=i, column=9).value = tongtien
 
-def Cach1_UpdateProfitToExcel():
-    # rows ,_ ,wb = ReadFile(path_File,False,2) # cần refactor -> do tốn ram nếu kích thước quá lớn => dùng context manager
+        if tongtien > 5000000:
+            ws.cell(row=i, column=10).value = "Cao"
+        elif tongtien > 200000:
+            ws.cell(row=i, column=10).value = "Trung bình"
+        else:
+            ws.cell(row=i, column=10).value = "Thấp"
+        print(f"Mã đơn: {ma_don} có tổng cước phí: {tongtien:,} loại cước phí là:{ws.cell(row=i, column=10).value}")
+    wb.save(path_File)
+    print("Lưu thành công")
 
-    # # Đọc dữ liệu từ dòng thứ 2
-    # for index, row in enumerate(rows):
-    #     #Input: lấy value từng cột tương ứng
-    #     # san_pham,so_luong,don_gia, gia_nhap = row[1].value, row[3].value, row[4].value, row[5].value
-    #     # row[7].value = LoiNhuan
-    #     # row[6].value = LoaiLoiNhuan
-    #     # print( f"{index + 1}.Sản phẩm: {san_pham}; Phân loại: {LoaiLoiNhuan}; Lợi nhuận: {LoiNhuan:,} ")
-    # wb.save(path_File)
-    pass
+def checkLocation(formLoca,toLoca):
+    return 0.05 if(LoaiKhuVuc[formLoca] == LoaiKhuVuc[toLoca]) else 0
 
-CheckHeader()
+if __name__ == "__main__":
+    CheckHeader()
+    TinhCuocPhi()
