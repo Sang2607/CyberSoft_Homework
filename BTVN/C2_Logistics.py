@@ -20,7 +20,6 @@ LoaiKhuVuc = {
 }
 rows ,ws ,wb = ReadFile(path_File,True,2,isMaxRow=True) # cần refactor -> do tốn ram nếu kích thước quá lớn => dùng context manager
 
-
 def CheckHeader():
     cells = {
     "cell1": "Mã đơn",
@@ -38,9 +37,27 @@ def CheckHeader():
         if ws.cell(row=1, column=i).value != cells[f"cell{i}"]:
             ws.cell(row=1, column=i).value = cells[f"cell{i}"]
             print(f"Đã thêm tiêu đề: {ws.cell(row=1, column=i).value}")
+
+def PhanLoaiCuocPhi(tongtien):
+    if tongtien > 5000000:
+        return "Cao"
+    elif tongtien > 200000:
+        return "Trung bình"
+    else:
+        return "Thấp"
+
+def TinhGiaGiam(KhoiLuong,from_location,to_location):
+    giamgia = 0
+    if KhoiLuong > kl20:
+        giamgia = 0.1
+    elif  KhoiLuong > kl5:
+        giamgia = 0.05
+    giamgia += checkLocation(from_location,to_location)
+    return giamgia
+
 def TinhCuocPhi():
     for i, row in enumerate(rows, start=2):
-        ma_don = rows[0]
+        ma_don = row[0]
         #tạo biến local
         khoi_luong = row[5] 
         cuoc_coban = row[7]
@@ -50,25 +67,17 @@ def TinhCuocPhi():
         phi_ban_dau = float(khoi_luong) *  float(cuoc_coban)
 
         #tính giá giảm
-        giamgia = 0
-        if khoi_luong > kl20:
-            giamgia = 0.1
-        elif  khoi_luong > kl5:
-            giamgia = 0.05
-        giamgia += checkLocation(from_location,to_location)
+        giamgia = TinhGiaGiam(khoi_luong,from_location,to_location)
         
         #tính tổng tiền
         tongtien = phi_ban_dau * (1-giamgia) # phibandau - phibandau*giamgia 
         if loai_vanchuyen == "Siêu tóc":
             tongtien += 20000
-        ws.cell(row=i, column=9).value = tongtien
 
-        if tongtien > 5000000:
-            ws.cell(row=i, column=10).value = "Cao"
-        elif tongtien > 200000:
-            ws.cell(row=i, column=10).value = "Trung bình"
-        else:
-            ws.cell(row=i, column=10).value = "Thấp"
+        #save cell
+        ws.cell(row=i, column=9).value = tongtien
+        ws.cell(row=i, column=10).value = PhanLoaiCuocPhi(tongtien)
+
         print(f"Mã đơn: {ma_don} có tổng cước phí: {tongtien:,} loại cước phí là:{ws.cell(row=i, column=10).value}")
     wb.save(path_File)
     print("Lưu thành công")
