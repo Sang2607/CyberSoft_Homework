@@ -12,6 +12,10 @@ def inputFloat(Mess = ""):
 def inputStr(Mess = ""):
     return input(Mess)
 
+@handle_exception
+def checkDict(value):
+    return isinstance(value, dict)
+
 def quickSort(arr): # Độ phức tạp O(nlogn)
     if len(arr) == 0:
         return []
