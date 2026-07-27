@@ -17,10 +17,10 @@ class DataReader:
         else:
             return cls._reader[ext].read(path,parm1)
             
-    def concat_dataFrame(self,dataFrame, dataFile):
+    def concat_dataFrame(self,dataFrame, dataFile, axis =0):
         if(not (checkDataFrame(dataFrame) and checkDataFrame(dataFile))):
             raise Exception("Param must be DataFrame tpye!")
-        result = pd.concat([dataFrame, dataFile], ignore_index=True)
+        result = pd.concat([dataFrame, dataFile], ignore_index=False,axis=axis)
         return result
     
 dataReader = DataReader()
