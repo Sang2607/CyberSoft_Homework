@@ -51,7 +51,7 @@ class XmlReader(DataReader):
 class XlsxReader(DataReader):
     #không truyền SheetName => lấy hết
     def read(self, path,SheetName=None):
-        print("Đã đọc XML")
+        print("Đã đọc xlsx")
         return pd.read_excel(path,sheet_name=SheetName)
     
 dataReader.register("csv", CsvReader())
